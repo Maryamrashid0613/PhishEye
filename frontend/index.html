@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>PhishEye — Quick Tester</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 24px; max-width: 720px; }
+    h1 { margin-bottom: 8px; }
+    label { display:block; margin-top:12px; font-weight:600; }
+    input[type="text"] { width:100%; padding:10px; font-size:14px; box-sizing:border-box; }
+    button { margin-top:10px; padding:10px 14px; font-size:14px; cursor:pointer; }
+    .result { margin-top:18px; padding:14px; border-radius:8px; background:#f4f4f4; }
+    .bad { border-left:6px solid #cc0000; }
+    .good { border-left:6px solid #2a9d8f; }
+    pre { background:#111; color:#d6f8d6; padding:12px; border-radius:6px; overflow:auto; }
+    .history { margin-top:16px; }
+    small.note { color:#666; display:block; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <h1>PhishEye — Quick Tester</h1>
+  <p>Type or paste a URL and click <strong>Check</strong>. The UI will call the local backend at <code>http://127.0.0.1:5000/predict</code>.</p>
+
+  <label for="url">URL</label>
+  <input id="url" type="text" placeholder="https://example.com or http://suspicious.example/login" />
+
+  <div>
+    <button id="btnCheck">Check</button>
+    <button id="btnClear">Clear</button>
+  </div>
+
+  <div id="status" class="note" style="margin-top:10px;"></div>
+
+  <div id="resultWrap" class="result" style="display:none;">
+    <h3 id="verdict"></h3>
+    <div><strong>Score:</strong> <span id="score"></span></div>
+    <div><strong>Reasons:</strong> <span id="reasons"></span></div>
+    <details style="margin-top:8px;"><summary>Full response (JSON)</summary><pre id="raw"></pre></details>
+  </div>
+
+  <div class="history">
+    <h4>History</h4>
+    <ul id="historyList"></ul>
+  </div>
+
+<script>
+const api = 'http://127.0.0.1:5000/predict';
+const btn = document.getElementById('btnCheck');
+const urlInput = document.getElementById('url');
+const status = document.getElementById('status');
+const resultWrap = document.getElementById('resultWrap');
+const verdictEl = document.getElementById('verdict');
+const scoreEl = document.getElementById('score');
+const reasonsEl = document.getElementById('reasons');
+const rawEl = document.getElementById('raw');
+const historyList = document.getElementById('historyList');
+const btnClear = document.getElementById('btnClear');
+
+function showStatus(msg, isError) {
+  status.textContent = msg;
+  status.style.color = isError ? '#b00' : '#333';
+}
+
+btn.addEventListener('click', async () => {
+  const url = urlInput.value.trim();
+  resultWrap.style.display = 'none';
+  if (!url) { showStatus('Please enter a URL', true); return; }
+  showStatus('Contacting backend...', false);
+  try {
+    const res = await fetch(api, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ url })
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      showStatus('Backend returned error: ' + res.status + ' — see console', true);
+      console.error('Backend error body:', txt);
+      return;
+    }
+    const data = await res.json();
+    showStatus('Response received', false);
+    // Display
+    const isPhish = data.verdict === 'phishing';
+    verdictEl.textContent = isPhish ? 'Phishing detected' : 'Likely benign';
+    verdictEl.style.color = isPhish ? '#cc0000' : '#2a9d8f';
+    scoreEl.textContent = (data.score !== undefined) ? data.score.toFixed(4) : '-';
+    reasonsEl.textContent = (data.reasons && data.reasons.length) ? data.reasons.join(', ') : '—';
+    rawEl.textContent = JSON.stringify(data, null, 2);
+    resultWrap.className = 'result ' + (isPhish ? 'bad' : 'good');
+    resultWrap.style.display = 'block';
+    // add to history
+    const li = document.createElement('li');
+    li.textContent = `${new Date().toLocaleTimeString()} — ${url} — ${data.verdict} (${(data.score||0).toFixed(3)})`;
+    historyList.prepend(li);
+  } catch (err) {
+    console.error(err);
+    showStatus('Could not reach backend — is the server running? (see console)', true);
+  }
+});
+
+btnClear.addEventListener('click', () => {
+  urlInput.value = '';
+  resultWrap.style.display = 'none';
+  showStatus('', false);
+});
+</script>
+</body>
+</html>
