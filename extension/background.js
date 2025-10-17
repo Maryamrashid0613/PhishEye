@@ -1,33 +1,20 @@
-chrome.runtime.onInstalled.addListener(() => {
-  console.log("PhishEye Background Loaded");
-});
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "loading" && tab.url.startsWith("http")) {
+    console.log("[PhishEye] Checking URL:", tab.url);
 
-async function checkURL(url) {
-  try {
-    const res = await fetch("http://127.0.0.1:5000/predict", {
+    fetch("http://127.0.0.1:5000/predict", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url })
-    });
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
+      body: JSON.stringify({ url: tab.url })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("[PhishEye] Prediction result:", data);
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url.startsWith("http")) {
-    checkURL(tab.url).then(result => {
-      if (result && result.verdict === "phishing") {
-        chrome.tabs.sendMessage(tabId, { action: "warnUser", data: result });
-
-        chrome.notifications.create({
-          type: "basic",
-          iconUrl: "icon.png",
-          title: "⚠️ Phishing Warning",
-          message: "This site may be dangerous!"
-        });
-      }
-    });
+        if (data.verdict === "phishing") {
+          chrome.tabs.update(tabId, { url: "warning.html?url=" + encodeURIComponent(tab.url) });
+        }
+      })
+      .catch(err => console.error("[PhishEye] Error contacting backend:", err));
   }
 });
