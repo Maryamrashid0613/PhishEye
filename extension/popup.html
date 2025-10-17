@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PhishEye Status</title>
+  <title>PhishEye Scanner</title>
   <style>
-    body { font-family: Arial; padding: 15px; width: 250px; }
-    button { padding: 8px; width: 100%; margin-top: 10px; }
+    body { font-family: Arial; width: 300px; padding: 10px; }
+    button { padding: 5px 10px; }
   </style>
 </head>
 <body>
-  <h3>🔒 PhishEye Running</h3>
-  <p>Protecting you from phishing sites.</p>
-  <button id="checkBtn">Check Current URL</button>
+  <h3>PhishEye URL Scanner</h3>
+  <input type="text" id="urlInput" placeholder="Enter URL" style="width:100%;">
+  <button id="scanBtn">Scan</button>
   <p id="result"></p>
   <script src="popup.js"></script>
 </body>
