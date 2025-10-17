@@ -1,21 +1,58 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
   <title>PhishEye Warning</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 24px; }
-    .box { border: 2px solid #cc0000; padding: 16px; border-radius: 6px; }
-    .btn { padding: 8px 12px; margin-right: 8px; }
+    body {
+      background-color: #ff4d4d;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .box {
+      background: #b30000;
+      margin: auto;
+      padding: 20px;
+      width: 400px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 10px;
+      margin: 10px;
+      background: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    .danger {
+      background: black;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <div class="box">
-    <h2 style="color:#cc0000">Warning — Potential Phishing Site</h2>
-    <p id="msg"></p>
-    <button id="go" class="btn">Proceed anyway</button>
-    <button id="back" class="btn">Go back</button>
+    <h2>⚠️ WARNING: Phishing Attempt Detected!</h2>
+    <p>This website has been flagged as potentially dangerous.</p>
+    <p id="url"></p>
+    <button onclick="goBack()">Go Back</button>
+    <button class="danger" onclick="proceed()">Proceed Anyway</button>
   </div>
-  <script src="warning.js"></script>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get('url');
+    document.getElementById('url').textContent = "URL: " + url;
+
+    function goBack() {
+      window.history.back();
+    }
+    function proceed() {
+      window.location.href = url;
+    }
+  </script>
 </body>
 </html>
