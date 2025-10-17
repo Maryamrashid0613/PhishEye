@@ -1,21 +1,33 @@
-chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.action === "warnUser") {
-    const banner = document.createElement("div");
-    banner.style.position = "fixed";
-    banner.style.top = "0";
-    banner.style.left = "0";
-    banner.style.width = "100%";
-    banner.style.background = "red";
-    banner.style.color = "white";
-    banner.style.padding = "15px";
-    banner.style.textAlign = "center";
-    banner.style.zIndex = "10000";
-    banner.innerText = `⚠️ WARNING: This site may be a phishing attempt! (${msg.data.url})`;
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "show_warning") {
+    if (!document.getElementById("phishing-warning-banner")) {
+      
+      // Play warning sound
+      const audio = new Audio(chrome.runtime.getURL("audio/alert.mp3"));
+      audio.play().catch(error => console.log("Audio play blocked:", error));
 
-    document.body.prepend(banner);
+      // Create warning banner
+      const banner = document.createElement("div");
+      banner.id = "phishing-warning-banner";
+      banner.innerHTML = `
+        <div class="warning-container">
+          <strong>⚠️ Warning: Suspicious Website Detected!</strong><br>
+          This website may be trying to steal your information.<br>
+          <button id="leave-site">Leave Site</button>
+          <button id="ignore-warning">Ignore Warning</button>
+        </div>
+      `;
+      document.body.prepend(banner);
 
-    if (!confirm("WARNING: This site is unsafe. Do you still want to continue?")) {
-      window.location.href = "about:blank";
+      // Redirect to Google if user clicks Leave Site
+      document.getElementById("leave-site").onclick = () => {
+        window.location.href = "https://www.google.com";
+      };
+
+      // Remove banner if user ignores
+      document.getElementById("ignore-warning").onclick = () => {
+        banner.remove();
+      };
     }
   }
 });
