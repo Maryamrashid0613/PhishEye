@@ -1,25 +1,24 @@
 {
-  "manifest_version": 3,
-  "name": "PhishEye - Anti Phishing Shield",
+  "name": "PhishEye - Real-Time Phishing Detector",
   "version": "1.0",
-  "description": "Detect and block phishing websites in real-time.",
-  "permissions": ["activeTab", "scripting", "storage", "notifications"],
-  "host_permissions": ["http://localhost:5000/*", "http://127.0.0.1:5000/*"],
+  "manifest_version": 3,
+  "description": "Detect phishing pages and warn users in real-time.",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://127.0.0.1:5000/*",
+    "http://localhost:5000/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon.png",
-      "48": "icon.png",
       "128": "icon.png"
     }
-  },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"]
-    }
-  ]
+  }
 }
