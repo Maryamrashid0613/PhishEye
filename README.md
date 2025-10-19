@@ -2,6 +2,7 @@ PhishEye is a machine learning–based phishing detection system that analyzes U
 
 
 Features:
+
 • Real-time phishing URL detection
 
 •	Smart URL feature extraction
@@ -76,11 +77,11 @@ Setup Instructions:
 
 Security Features:
 
- Real-time phishing alerts
+ 1. Real-time phishing alerts
  
- Browser blocking + warning
+ 2. Browser blocking + warning
  
- URL risk scoring
+ 3. URL risk scoring
  
- Logs suspicious activity
+ 4. Logs suspicious activity
  
