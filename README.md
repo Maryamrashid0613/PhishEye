@@ -2,25 +2,40 @@ PhishEye is a machine learning–based phishing detection system that analyzes U
 
 Features:
 • Real-time phishing URL detection
+
 •	Smart URL feature extraction
+
 •	Machine Learning model (Random Forest)
+
 • Chrome Extension integration
+
 • Fast Flask REST API backend
+
 • User Interface to manually check links
+
 • Instant browser phishing warnings
+
 • URL threat logging using SQLite
+
 • Custom feature extraction module
+
 
 Dataset & Model Training:
 Dataset combined from phishing and benign URL datasets (Kaggle). Custom feature extraction (URL length, HTTPS check, entropy, digit ratio, special characters). Model: Random Forest Classifier saved as phisheye_rf.joblib.
 
 Tech Stack:
 Component	Technology
+
 Frontend	Chrome Extension
+
 Backend 	Flask API (Python)
+
 ML Model	Scikit-learn (Random Forest)
+
 Database	SQLite
+
 Packaging	Joblib
+
 
 Project Structure:
 PhishEye/
